@@ -25,6 +25,10 @@ const votingSchema = mongoose.Schema({
     type: Number,
     default: 0,
   },
+  voter: {
+    type: [String],
+    default: [],
+  },
 })
 
 const Voting = mongoose.models.Voting || mongoose.model("Voting", votingSchema)

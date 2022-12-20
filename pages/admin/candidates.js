@@ -21,6 +21,7 @@ export default function CandidatePage() {
   const [candidates, setCandidates] = useState([])
   const [isOpen, setIsOpen] = useState(false)
   const [candidatesForVotings, setCandidatesForVotings] = useState([])
+  const [isUpdate, setIsUpdate] = useState(false)
 
   useEffect(() => {
     const getCandidates = async () => {
@@ -109,6 +110,17 @@ export default function CandidatePage() {
     })
   }
 
+  const prepAddCandidate = () => {
+    setIsOpen(true)
+    setIsUpdate(false)
+    setValues((prev) => (prev = { ...prev, ketua: "" }))
+    setValues((prev) => (prev = { ...prev, wakil: "" }))
+    setValues((prev) => (prev = { ...prev, visi: "" }))
+    setValues((prev) => (prev = { ...prev, misi: "" }))
+    setFile(null)
+    setFileName("")
+  }
+
   const onAddCandidate = async (e) => {
     e.preventDefault()
 
@@ -176,22 +188,133 @@ export default function CandidatePage() {
     }
 
     getCandidatesForVotings()
-  }, [session])
+  }, [session?.accessToken])
+
+  const onDeleteCandidate = async (id) => {
+    try {
+      const response = await fetch(`/api/votings/deleteCandidate/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${session.accessToken}`,
+        },
+      })
+
+      setCandidatesForVotings((prev) => prev.filter(({ _id }) => _id !== id))
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  const [selectedCandidateId, setSelectedCandidateId] = useState("")
+
+  const prepCandidateBeforeUpdate = (candidate) => {
+    setIsUpdate(true)
+    setIsOpen(true)
+    setSelectedCandidateId(candidate._id)
+    setValues((prev) => (prev = { ...prev, ketua: candidate.ketua }))
+    setValues((prev) => (prev = { ...prev, wakil: candidate.wakil }))
+    setValues((prev) => (prev = { ...prev, visi: candidate.visi }))
+    setValues((prev) => (prev = { ...prev, misi: candidate.misi }))
+    setFileName((prev) => (prev = candidate.thumbnail))
+  }
+
+  const onUpdateCandidate = async (e) => {
+    e.preventDefault()
+
+    if (currentStep !== 1) return onNextStep()
+
+    const fd = new FormData()
+
+    fd.append("ketua", ketua)
+    fd.append("wakil", wakil)
+    fd.append("visi", visi)
+    fd.append("misi", misi)
+    fd.append("thumbnail", file)
+
+    if (session) {
+      try {
+        const response = await fetch(
+          `/api/votings/updateCandidate/${selectedCandidateId}`,
+          {
+            method: "PUT",
+            headers: {
+              Authorization: `Bearer ${session.accessToken}`,
+            },
+            body: fd,
+          }
+        )
+
+        const data = await response.json()
+
+        const candidate = data.candidateForVotings
+
+        setCandidatesForVotings((prev) =>
+          prev.map((obj) =>
+            obj._id === candidate._id ? { ...obj, ...candidate } : obj
+          )
+        )
+
+        if (response.ok) {
+          setValues((prev) => (prev = { ...prev, ketua: "" }))
+          setValues((prev) => (prev = { ...prev, wakil: "" }))
+          setValues((prev) => (prev = { ...prev, visi: "" }))
+          setValues((prev) => (prev = { ...prev, misi: "" }))
+          setFile(null)
+          setFileName("")
+          setCurrentStep(0)
+          setIsOpen(false)
+        }
+      } catch (error) {
+        console.log(error)
+      }
+    }
+  }
+
+  const [endPeriod, setEndPeriod] = useState("")
+  const [date, setDate] = useState("")
+
+  const onSetEndPeriod = () => {
+    localStorage.setItem("endPeriod", endPeriod)
+  }
+
+  useEffect(() => {
+    setDate(localStorage.getItem("endPeriod"))
+  }, [endPeriod])
 
   return (
     <>
       <div className="mb-10">
         <div className="flex justify-between mb-3">
-          <h1 className="font-semibold text-lg mb-3">
-            Kandidat Ketua & Wakil Ketua
-          </h1>
-          <button
-            onClick={() => setIsOpen(!isOpen)}
-            className="ml-auto bg-primary text-white flex items-center gap-x-1 font-semibold rounded-md py-2 px-4"
-          >
-            <MdAdd size={20} />
-            Add Candidate
-          </button>
+          <div>
+            <h1 className="font-semibold text-lg mb-3">
+              Kandidat Ketua & Wakil Ketua
+            </h1>
+            Batas Waktu Voting : <span className="text-green-500">{date}</span>
+          </div>
+          <div className="flex items-center gap-x-3">
+            <input
+              type="date"
+              value={endPeriod}
+              className="rounded-md border border-primary focus:outline-primary py-2 px-4"
+              onChange={(e) => setEndPeriod(e.target.value)}
+            />
+            <button
+              onClick={onSetEndPeriod}
+              className={`border border-primary text-primary font-semibold rounded-md py-2 px-4 ${
+                !endPeriod && "opacity-50"
+              }`}
+              disabled={!endPeriod ? true : false}
+            >
+              Atur Batas Waktu Voting
+            </button>
+            <button
+              onClick={prepAddCandidate}
+              className="bg-primary text-white flex items-center gap-x-1 font-semibold rounded-md py-2 px-4"
+            >
+              <MdAdd size={20} />
+              Add Candidate
+            </button>
+          </div>
         </div>
 
         {!candidatesForVotings.length ? (
@@ -229,10 +352,12 @@ export default function CandidatePage() {
                   <h1 className="text-gray-500 text-sm">Lihat Visi & Misi</h1>
                   <div className="flex gap-x-3 mt-3">
                     <MdEditNote
+                      onClick={() => prepCandidateBeforeUpdate(obj)}
                       size={25}
                       className="hover:text-primary duration-300 cursor-pointer"
                     />
                     <MdDeleteSweep
+                      onClick={() => onDeleteCandidate(obj._id)}
                       size={25}
                       className="text-red-500 hover:text-red-700 duration-300 cursor-pointer"
                     />
@@ -310,13 +435,17 @@ export default function CandidatePage() {
       </div>
 
       <Modal
-        title={"Add Candidate for Votings"}
+        title={
+          !isUpdate
+            ? "Add Candidate for Votings"
+            : "Update Candidate for Votings"
+        }
         open={isOpen}
         onClose={() => setIsOpen(false)}
       >
         {currentStep === 0 && (
           <>
-            <form onSubmit={onAddCandidate}>
+            <form onSubmit={!isUpdate ? onAddCandidate : onUpdateCandidate}>
               {inputs.map((input, i) => (
                 <FormInput
                   key={i}
@@ -361,7 +490,7 @@ export default function CandidatePage() {
               <HiOutlineArrowNarrowLeft size={25} />
               <span className="font-semibold text-primary">Back</span>
             </button>
-            <form onSubmit={onAddCandidate}>
+            <form onSubmit={!isUpdate ? onAddCandidate : onUpdateCandidate}>
               <div className="mb-5">
                 <div>
                   <label>Visi</label>
@@ -389,7 +518,7 @@ export default function CandidatePage() {
               <div className="flex items-center gap-x-5">
                 <div className="w-full">
                   <Button
-                    text={"Submit"}
+                    text={!isUpdate ? "Submit" : "Update"}
                     defaultBgColor={"bg-black"}
                     defaultTxtColor={"text-white"}
                     hoverColor={"bg-primary"}

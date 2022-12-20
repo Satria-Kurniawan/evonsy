@@ -4,8 +4,10 @@ import { MdHowToVote } from "react-icons/md"
 import Modal from "../../components/Modal"
 import Button from "../../components/Button"
 import { useRouter } from "next/router"
+import { useSession } from "next-auth/react"
 
 export default function VotingCandidatesPage() {
+  const { data: session } = useSession()
   const router = useRouter()
   const [candidatesForVotings, setCandidatesForVotings] = useState([])
   const [isWaiting, setIsWaiting] = useState(false)
@@ -21,6 +23,12 @@ export default function VotingCandidatesPage() {
       .finally(() => setIsWaiting(false))
   }, [])
 
+  const skeletons = []
+
+  for (let i = 0; i < 3; i++) {
+    skeletons.push(i)
+  }
+
   const [isOpen, setIsOpen] = useState(false)
   const [selected, setSelected] = useState({})
 
@@ -30,10 +38,39 @@ export default function VotingCandidatesPage() {
     setSelected((prev) => ({ ...prev, no: number }))
   }
 
-  const skeletons = []
+  const onVoteCandidate = async () => {
+    if (!session) return
 
-  for (let i = 0; i < 3; i++) {
-    skeletons.push(i)
+    try {
+      const response = await fetch(
+        `/api/votings/voteCandidate/${selected._id}`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${session.accessToken}`,
+          },
+        }
+      )
+      const data = await response.json()
+
+      if (data.hasVoted) {
+        console.log(data)
+      } else {
+        router.push("/votings/livecount")
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  const [endPeriod, setIsEndPeriod] = useState("")
+
+  useEffect(() => {
+    setIsEndPeriod(localStorage.getItem("endPeriod"))
+  }, [])
+
+  if (new Date() > new Date(endPeriod)) {
+    return <div>Over</div>
   }
 
   return (
@@ -50,7 +87,7 @@ export default function VotingCandidatesPage() {
           <div className="mx-auto grid grid-cols-3 gap-x-5 max-w-[52rem]">
             {isWaiting
               ? skeletons.map((obj, i) => (
-                  <div>
+                  <div key={i}>
                     <div className="rounded-md w-full h-64 mb-3 skeleton"></div>
                     <div className="flex items-center gap-x-5">
                       <div className="rounded-full w-10 h-10 skeleton"></div>
@@ -63,7 +100,7 @@ export default function VotingCandidatesPage() {
                 ))
               : candidatesForVotings.map((obj, i) => (
                   <>
-                    <div>
+                    <div key={i}>
                       <div className="relative rounded-md group">
                         <Image
                           src={`/thumbnails/${obj.thumbnail}`}
@@ -130,10 +167,7 @@ export default function VotingCandidatesPage() {
                     hoverColor={"bg-red-500"}
                   />
                 </div>
-                <div
-                  onClick={() => router.push("/votings/livecount")}
-                  className="w-full"
-                >
+                <div onClick={onVoteCandidate} className="w-full">
                   <Button
                     text={"Vote"}
                     borderColor={"border-primary"}

@@ -13,4 +13,6 @@ export default withAuth(function middleware(req) {
     return NextResponse.redirect(new URL("/", req.url))
 })
 
-export const config = { matcher: ["/openrecruitment", "/admin/:path*"] }
+export const config = {
+  matcher: ["/openrecruitment", "/votings/candidates", "/admin/:path*"],
+}

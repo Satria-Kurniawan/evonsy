@@ -30,11 +30,13 @@ const Navbar = () => {
             <li className="pb-2 pr-5">
               <Image src={logoBemFtk} width={40} height={40} alt={"BEM FTK"} />
             </li>
-            <li className="pb-2 cursor-pointer">
-              <Link href="/">
-                <span>Beranda</span>
-              </Link>
-            </li>
+            {router.pathname !== "/" && (
+              <li className="pb-2 cursor-pointer">
+                <Link href="/">
+                  <span>Beranda</span>
+                </Link>
+              </li>
+            )}
             {router.pathname === "/" && (
               <li className="pb-2 cursor-pointer">
                 <LinkRs

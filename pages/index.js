@@ -159,7 +159,7 @@ export default function Home() {
               <Link href={layanan.path} className="z-20">
                 <div className="max-w-[8rem]">
                   <Button
-                    text={"Gas"}
+                    text={"Lihat"}
                     defaultTxtColor={"text-primary"}
                     borderColor={"border-primary"}
                     hoverColor={"bg-primary"}

@@ -1,7 +1,5 @@
 import mongoDbConnect from "../../../utils/mongoConnection"
 import Candidate from "../../../models/Candidate"
-import withAuth from "../../../middleware/withAuth"
-import withRole from "../../../middleware/withRole"
 
 async function getCandidates(req, res) {
   await mongoDbConnect()
@@ -18,4 +16,4 @@ async function getCandidates(req, res) {
   }
 }
 
-export default withAuth(withRole(getCandidates, "admin"))
+export default getCandidates
