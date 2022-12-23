@@ -35,8 +35,6 @@ export default function DetailAnnouncementPage() {
       .catch((error) => console.log(error))
   }, [])
 
-  console.log(winners)
-
   return (
     <div className="my-10">
       <div className="flex items-center gap-x-3 mb-10">

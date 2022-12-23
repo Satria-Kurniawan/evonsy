@@ -5,6 +5,7 @@ import Modal from "../../components/Modal"
 import Button from "../../components/Button"
 import { useRouter } from "next/router"
 import { useSession } from "next-auth/react"
+import { toast } from "react-toastify"
 
 export default function VotingCandidatesPage() {
   const { data: session } = useSession()
@@ -54,7 +55,7 @@ export default function VotingCandidatesPage() {
       const data = await response.json()
 
       if (data.hasVoted) {
-        console.log(data)
+        toast.error(data.message)
       } else {
         router.push("/votings/livecount")
       }
@@ -154,9 +155,13 @@ export default function VotingCandidatesPage() {
               <h1>{selected.wakil}</h1>
               <div className="rounded-md border p-3 font-normal text-sm text-gray-500 mb-5">
                 <h1 className="text-primary">Visi</h1>
-                <p>{selected.visi}</p>
-                <h1 className="text-primary">Misi</h1>
-                <p>{selected.misi}</p>
+                <p>{selected.visi && selected.visi.split(/\r?\n|\r|\n/g)[0]}</p>
+                <p>{selected.visi && selected.visi.split(/\r?\n|\r|\n/g)[1]}</p>
+                <p>{selected.visi && selected.visi.split(/\r?\n|\r|\n/g)[2]}</p>
+                <h1 className="text-primary mt-1">Misi</h1>
+                <p>{selected.misi && selected.misi.split(/\r?\n|\r|\n/g)[0]}</p>
+                <p>{selected.misi && selected.misi.split(/\r?\n|\r|\n/g)[1]}</p>
+                <p>{selected.misi && selected.misi.split(/\r?\n|\r|\n/g)[2]}</p>
               </div>
               <div className="flex gap-x-3">
                 <div onClick={() => setIsOpen(false)} className="w-full">

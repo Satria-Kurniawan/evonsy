@@ -31,7 +31,6 @@ export default function OpenRecruitmentPage() {
   const jabatan = ["Ketua & Wakil", "Sekretaris", "Bendahara"]
 
   const berkas = [
-    { name: "Persetujuan Orang Tua", required: true },
     { name: "KHS (Kartu Hasil Studi)", required: true },
     { name: "CV (Curriculum Vitae)", required: false },
     { name: "Foto", required: true },
@@ -257,7 +256,11 @@ export default function OpenRecruitmentPage() {
               </div>
             </div>
             <div>
-              <Link href={"/Template_Berkas_BEM.docx"} target="_blank" download>
+              <Link
+                href={"/uploads/Template_Berkas_BEM.docx"}
+                target="_blank"
+                download
+              >
                 <div className="flex items-center gap-x-3 cursor-pointer">
                   <span className="text-primary">Download Template</span>
                   <CgSoftwareDownload size={20} />

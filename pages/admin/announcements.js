@@ -12,6 +12,7 @@ import {
 import Modal from "../../components/Modal"
 import FormInput from "../../components/FormInput"
 import Button from "../../components/Button"
+import { toast } from "react-toastify"
 
 export default function AnnouncementPage() {
   const { data: session } = useSession()
@@ -95,6 +96,7 @@ export default function AnnouncementPage() {
         setAnnouncements([...announcements, announcement])
 
         if (response.ok) {
+          toast.success(data.message)
           setValues((prev) => (prev = { ...prev, title: "" }))
           setValues((prev) => (prev = { ...prev, subtitle: "" }))
           setValues((prev) => (prev = { ...prev, content: "" }))
@@ -164,6 +166,7 @@ export default function AnnouncementPage() {
         )
 
         if (response.ok) {
+          toast.success(data.message)
           setValues((prev) => (prev = { ...prev, title: "" }))
           setValues((prev) => (prev = { ...prev, subtitle: "" }))
           setValues((prev) => (prev = { ...prev, content: "" }))

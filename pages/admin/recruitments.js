@@ -157,10 +157,12 @@ export default function RecruitmentPage() {
         open={isOpen}
         title={
           selectedCandidate.statusPendaftaran === "Seleksi Administrasi" ? (
-            "Seleksi Administrasi"
+            <h1 className="mr-5">"Seleksi Administrasi"</h1>
+          ) : selectedCandidate.statusPendaftaran === "Lulus Seleksi I" ? (
+            <h1 className="mr-5">Tetapkan sebagai Ketua & Wakil Ketua Umum</h1>
           ) : (
             <>
-              <span>Seleksi Wawancara</span>
+              <h1>Seleksi Wawancara</h1>
               <p className="font-normal text-sm text-gray-500 max-w-[30rem]">
                 {selectedCandidate.divisi === "Umum" &&
                 selectedCandidate.jabatan === "Ketua & Wakil"
@@ -222,7 +224,11 @@ export default function RecruitmentPage() {
         <div className="flex gap-x-5">
           <div onClick={() => onSeleksi("Tidak Lulus")}>
             <Button
-              text={"Tidak Lulus"}
+              text={
+                selectedCandidate.statusPendaftaran === "Lulus Seleksi I"
+                  ? "Tidak"
+                  : "Tidak Lulus"
+              }
               defaultTxtColor={"text-red-500"}
               borderColor={"border-red-500"}
               hoverColor={"bg-red-500"}
@@ -231,15 +237,21 @@ export default function RecruitmentPage() {
           <div
             onClick={() =>
               selectedCandidate.statusPendaftaran === "Seleksi Administrasi"
-                ? onSeleksi("Seleksi Administrasi")
+                ? onSeleksi("Lulus Administrasi")
                 : selectedCandidate.divisi !== "Umum" &&
                   selectedCandidate.jabatan !== "Ketua & Wakil Ketua"
+                ? onSeleksi("Terpilih")
+                : selectedCandidate.statusPendaftaran === "Lulus Seleksi I"
                 ? onSeleksi("Terpilih")
                 : onSeleksi("Lulus Seleksi I")
             }
           >
             <Button
-              text={"Lulus"}
+              text={
+                selectedCandidate.statusPendaftaran === "Lulus Seleksi I"
+                  ? "Ya"
+                  : "Lulus"
+              }
               defaultTxtColor={"text-green-500"}
               borderColor={"border-green-500"}
               hoverColor={"bg-green-500"}

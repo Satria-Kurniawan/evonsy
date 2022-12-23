@@ -15,6 +15,7 @@ import Modal from "../../components/Modal"
 import FormInput from "../../components/FormInput"
 import Button from "../../components/Button"
 import Image from "next/image"
+import { toast } from "react-toastify"
 
 export default function CandidatePage() {
   const { data: session } = useSession()
@@ -152,6 +153,7 @@ export default function CandidatePage() {
         ])
 
         if (response.ok) {
+          toast.success(data.message)
           setValues((prev) => (prev = { ...prev, ketua: "" }))
           setValues((prev) => (prev = { ...prev, wakil: "" }))
           setValues((prev) => (prev = { ...prev, visi: "" }))
@@ -255,6 +257,7 @@ export default function CandidatePage() {
         )
 
         if (response.ok) {
+          toast.success(data.message)
           setValues((prev) => (prev = { ...prev, ketua: "" }))
           setValues((prev) => (prev = { ...prev, wakil: "" }))
           setValues((prev) => (prev = { ...prev, visi: "" }))
