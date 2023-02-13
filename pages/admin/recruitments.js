@@ -157,7 +157,7 @@ export default function RecruitmentPage() {
         open={isOpen}
         title={
           selectedCandidate.statusPendaftaran === "Seleksi Administrasi" ? (
-            <h1 className="mr-5">"Seleksi Administrasi"</h1>
+            <h1 className="mr-5">Seleksi Administrasi</h1>
           ) : selectedCandidate.statusPendaftaran === "Lulus Seleksi I" ? (
             <h1 className="mr-5">Tetapkan sebagai Ketua & Wakil Ketua Umum</h1>
           ) : (

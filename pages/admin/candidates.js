@@ -190,7 +190,7 @@ export default function CandidatePage() {
     }
 
     getCandidatesForVotings()
-  }, [session?.accessToken])
+  }, [session])
 
   const onDeleteCandidate = async (id) => {
     try {
